@@ -3,21 +3,26 @@
 > pip install azure-ai-inference azure.identity
 """
 import os
+from dotenv import load_dotenv
+from dotenv import dotenv_values
+from pathlib import Path
 from azure.ai.inference import ChatCompletionsClient
 from azure.ai.inference.models import AssistantMessage, SystemMessage, UserMessage, ToolMessage
 from azure.ai.inference.models import ImageContentItem, ImageUrl, TextContentItem
 from azure.identity import InteractiveBrowserCredential #DefaultAzureCredential
-# from azure.identity import AzureCliCredential
 
+config = dotenv_values(".env")
 
-Tenant_id="d5e769b0-fd19-45e4-a4a8-b73545450234"
+TENANT_ID = config.get("TENANT_ID")
+ENDPOINT = config.get("AZURE_ENDPOINT")
+MODEL = config.get("MODEL_NAME")
 
 credential = InteractiveBrowserCredential(
-    tenant_id=Tenant_id
+    tenant_id=TENANT_ID
 )
 
 client = ChatCompletionsClient(
-    endpoint = "https://real-time-aaf-resource.services.ai.azure.com/models",
+    endpoint = ENDPOINT,
     credential=credential,
     credential_scopes=["https://cognitiveservices.azure.com/.default"],
     api_version = "2024-05-01-preview",
@@ -35,7 +40,7 @@ tools = []
 while True:
     response = client.complete(
         messages = messages,
-        model = "Llama-3.3-70B-Instruct",
+        model = MODEL,
         tools = tools,
         max_tokens = 2048,
     )
